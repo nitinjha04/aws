@@ -1,0 +1,31 @@
+name: Deploy to AWS CodeDeploy
+
+on:
+  push:
+    branches:
+      - main  # Trigger the workflow on pushes to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v2
+
+    - name: Install AWS CLI
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y awscli
+
+    - name: Deploy to AWS CodeDeploy
+      run: |
+        aws deploy create-deployment \
+          --application-name codedeployer \
+          --deployment-group-name deploymentGroup \
+          --github-location repository=nitinjha04/aws,commitId=${{ github.sha }}
+
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: eu-north-1
